@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 3: Processes — Interactive Lecture</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f2;color:#1a1a1a;min-height:100vh}
+.app{max-width:760px;margin:0 auto;padding:1.5rem}
+.header{background:#fff;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem;border:1px solid #e5e5e0;display:flex;align-items:center;gap:1rem}
+.header-title{font-size:18px;font-weight:600;color:#1a1a1a}
+.header-sub{font-size:13px;color:#777;margin-top:2px}
+.progress-bar{background:#fff;border-radius:12px;padding:1rem 1.5rem;margin-bottom:1rem;border:1px solid #e5e5e0}
+.progress-label{font-size:12px;color:#888;margin-bottom:8px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+.dots{display:flex;gap:5px;flex-wrap:wrap}
+.dot{width:14px;height:14px;border-radius:50%;background:#e5e5e0;cursor:pointer;border:none;transition:background .2s;flex-shrink:0}
+.dot.active{background:#5340B7}
+.dot.done{background:#1D9E75}
+.slide{background:#fff;border-radius:12px;padding:1.5rem;border:1px solid #e5e5e0;margin-bottom:1rem}
+.slide-section{font-size:11px;font-weight:600;color:#5340B7;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.4rem}
+.slide-title{font-size:21px;font-weight:600;color:#1a1a1a;margin-bottom:1.25rem;line-height:1.3}
+.text{font-size:15px;line-height:1.8;color:#2a2a2a;margin-bottom:1rem}
+.callout{background:#f5f3ff;border-left:3px solid #5340B7;border-radius:0 8px 8px 0;padding:.75rem 1rem;margin:1rem 0;font-size:14px;line-height:1.7;color:#3c3a4a}
+.callout.green{background:#eaf3de;border-left-color:#1D9E75;color:#1e3d10}
+.callout.amber{background:#faeeda;border-left-color:#BA7517;color:#4a2e05}
+.callout.red{background:#fcebeb;border-left-color:#A32D2D;color:#4a1515}
+.analogy{background:#f9f9f6;border:1px solid #e5e5e0;border-radius:10px;padding:1rem 1.25rem;margin:1rem 0;font-size:14px;line-height:1.7;color:#444}
+.analogy-label{font-size:11px;font-weight:700;color:#5340B7;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin:1rem 0}
+.card{background:#f9f9f6;border:1px solid #e5e5e0;border-radius:10px;padding:.75rem 1rem}
+.card h4{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:4px}
+.card p{font-size:12px;color:#555;line-height:1.6}
+.ascii{background:#1e1e1e;color:#d4d4d4;border-radius:8px;padding:1rem;font-family:'Courier New',monospace;font-size:12px;margin:1rem 0;line-height:1.8;overflow-x:auto;white-space:pre}
+.quiz{background:#f0eeff;border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0;border:1px solid #d4caff}
+.quiz h4{font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:.75rem}
+.qopt{display:block;width:100%;text-align:left;background:#fff;border:1px solid #d4caff;border-radius:8px;padding:9px 13px;font-size:13px;cursor:pointer;color:#1a1a1a;margin-bottom:6px;transition:border-color .15s;font-family:inherit}
+.qopt:hover:not(:disabled){border-color:#5340B7;background:#faf8ff}
+.qopt.correct{border-color:#1D9E75;background:#eaf3de;color:#1e3d10}
+.qopt.wrong{border-color:#A32D2D;background:#fcebeb;color:#4a1515}
+.qfb{font-size:13px;margin-top:8px;display:none;line-height:1.6;padding:.5rem .75rem;border-radius:6px}
+.qfb.ok{background:#eaf3de;color:#1e3d10}
+.qfb.no{background:#fcebeb;color:#4a1515}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:1rem;border-top:1px solid #e5e5e0}
+.nbtn{padding:8px 18px;border-radius:8px;border:1px solid #d0d0c8;background:#fff;font-size:14px;cursor:pointer;color:#1a1a1a;font-family:inherit;transition:background .15s}
+.nbtn:hover:not(:disabled){background:#f5f5f2}
+.nbtn:disabled{opacity:.4;cursor:default}
+.nbtn.primary{background:#5340B7;border-color:#5340B7;color:#fff}
+.nbtn.primary:hover{background:#3c3489}
+.counter{font-size:13px;color:#888}
+.chip{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;margin:2px}
+.chip-purple{background:#eeedfe;color:#3c3489}
+.chip-teal{background:#e1f5ee;color:#085041}
+.chip-amber{background:#faeeda;color:#633806}
+.chip-red{background:#fcebeb;color:#791f1f}
+.explore-btn{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #d0d0c8;border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer;color:#1a1a1a;margin:4px 4px 4px 0;font-family:inherit;transition:background .15s}
+.explore-btn:hover{background:#f5f5f2;border-color:#5340B7;color:#5340B7}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div style="width:44px;height:44px;border-radius:50%;background:#eeedfe;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">⚙️</div>
+    <div>
+      <div class="header-title">Chapter 3: Processes</div>
+      <div class="header-sub">Operating Systems — Interactive Lecture</div>
+    </div>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-label">Progress</div>
+    <div class="dots" id="dots"></div>
+  </div>
+  <div class="slide" id="slide"></div>
+</div>
+
+<script>
+const slides = [
+{sec:"Introduction",title:"The Big Picture — What is a Process?",
+content:`<p class="text">Welcome. Today's chapter is one of the most important in Operating Systems. We're going to answer a deceptively simple question: <strong>what is actually running on your computer right now?</strong></p>
+<p class="text">Early computers were simple — they ran <strong>one program at a time</strong>. That program had complete, exclusive control over the CPU, memory, and every device attached to the machine. It was like a single-lane road: only one car could pass at a time.</p>
+<p class="text">Modern computers are completely different. As you read this, your machine might be running a browser, a music player, antivirus software, a background update service, and dozens of system utilities — all <em>seemingly at the same time</em>. How is that possible? The answer is the concept of a <strong>process</strong>.</p>
+<div class="analogy"><div class="analogy-label">🍳 Analogy</div>A <em>program</em> is like a recipe written on paper — it's passive, just instructions sitting there. A <em>process</em> is the act of <strong>cooking that recipe</strong> — the recipe in motion, with ingredients, a pot on the stove, and a chef actively working. You can cook the same recipe twice simultaneously using two separate pots — those are two processes running the same program.</div>
+<div class="callout">A <strong>process</strong> is formally defined as: <em>a program in execution</em>. It is the unit of work in a modern computing system.</div>
+<p class="text">The OS manages all these processes — creating them, deciding which one runs on the CPU at any moment, keeping them isolated from each other, and eventually cleaning up when they finish. This entire lifecycle is what Chapter 3 is about.</p>`,
+quiz:{q:"What is the fundamental difference between a program and a process?",opts:["A program is stored in RAM; a process is on disk","A program is passive instructions on disk; a process is that program actively executing in memory","They are the same thing — the terms are interchangeable","A process can only run one instruction at a time, while programs run many"],ans:1,exp:"A program is a passive entity — a file containing instructions, sitting on disk, doing nothing. A process is active — that program has been loaded into memory, has a program counter pointing to the next instruction, has been allocated resources, and is actually executing. One program can spawn many processes."}
+},
+{sec:"3.1.1",title:"The Process — Four Sections in Memory",
+content:`<p class="text">When the OS loads a program and starts a process, it carves out a region of memory divided into <strong>four distinct sections</strong>. You need to understand each of them — their sizes, their purposes, and how they behave.</p>
+<div class="grid">
+<div class="card"><h4>📄 Text Section</h4><p>The actual machine code instructions — the "recipe" itself. It is <strong>fixed in size</strong> and doesn't change while the program runs. All threads of a process share this.</p></div>
+<div class="card"><h4>📦 Data Section</h4><p>Global and static variables — declared outside any function. Example: <code>int counter = 0;</code> at the top of a C file. Also <strong>fixed in size</strong>.</p></div>
+<div class="card"><h4>🔼 Heap</h4><p>Dynamically allocated memory — what you get from <code>malloc()</code> in C or <code>new</code> in C++/Java. <strong>Grows upward</strong> toward higher memory addresses as you allocate more.</p></div>
+<div class="card"><h4>🔽 Stack</h4><p>Temporary storage for function calls: parameters, local variables, return addresses. <strong>Grows downward</strong>. Every function call pushes a frame; every return pops it.</p></div>
+</div>
+<div class="ascii">Memory (high address at top)
+┌─────────────────┐ ← high address
+│   argc, argv    │
+├─────────────────┤
+│   Stack  ↓      │ grows downward
+│                 │
+│   (gap)         │ ← OS ensures these never meet
+│                 │
+│   Heap   ↑      │ grows upward
+├─────────────────┤
+│ Uninit. data    │
+├─────────────────┤
+│ Init. data      │
+├─────────────────┤
+│   Text          │ ← low address
+└─────────────────┘</div>
+<div class="callout amber">⚠️ Common confusion: The <strong>stack and heap grow toward each other</strong>. If they ever meet, you get a <em>stack overflow</em> — a crash. The OS actively monitors this.</div>
+<p class="text">Critically: <strong>two processes can run the same program</strong> but are completely independent. They share the same text section logic, but have <strong>completely separate</strong> stack, heap, and data. Open two browser windows — same program, two separate processes with separate memory.</p>`,
+quiz:{q:"A programmer calls malloc() to request 100 bytes during program execution. Which memory section grows?",opts:["Text section","Data section","Heap section","Stack section"],ans:2,exp:"malloc() is a dynamic memory allocation call — it allocates memory at runtime. This memory comes from the heap, which grows upward as more allocations are made. The stack, by contrast, grows automatically when functions are called and shrinks when they return. malloc() explicitly grows the heap; function calls implicitly grow the stack."}
+},
+{sec:"3.1.2",title:"Process States — The Lifecycle of a Process",
+content:`<p class="text">A process doesn't just sit in memory doing nothing, nor does it run flat-out forever. It moves through a defined set of <strong>states</strong> during its lifetime. Think of these as the process's current status badge.</p>
+<div class="grid">
+<div class="card"><h4>🆕 New</h4><p>The process is being created. OS is allocating memory, building the PCB, setting things up. Not yet running.</p></div>
+<div class="card"><h4>⏳ Ready</h4><p>Ready to run, just waiting for the CPU. Many processes can be in this state simultaneously. They're in the Ready Queue.</p></div>
+<div class="card"><h4>⚡ Running</h4><p>Instructions are actively executing on a CPU core. On a single core, <strong>only one process</strong> can be in this state at any instant.</p></div>
+<div class="card"><h4>😴 Waiting</h4><p>Paused, waiting for an external event — a disk read, network packet, or user input. Not using the CPU. Also called Blocked.</p></div>
+<div class="card"><h4>🏁 Terminated</h4><p>Finished execution. OS cleans up resources. Entry may remain briefly in the process table.</p></div>
+</div>
+<div class="ascii">
+          admitted          interrupt
+   New ──────────► Ready ◄───────────────────┐
+                     │                        │
+              scheduler                   Running
+              dispatch                       │
+                     │                       │ I/O request
+                     ▼                       ▼
+                  Running            ──► Waiting
+                     │                       │
+                    exit              I/O completes
+                     │                       │
+                  Terminated         ──► Ready
+</div>
+<div class="callout"><strong>Key insight:</strong> After a process finishes waiting (I/O completes), it goes back to <strong>Ready</strong> — NOT directly back to Running. It must compete again with all other ready processes. This is a very common exam mistake!</div>
+<p class="text"><strong>Ready vs Waiting — the crucial distinction:</strong> "Ready" means "I have everything I need, just give me the CPU." "Waiting" means "I don't have what I need yet — I'm blocked until some external event happens." These are fundamentally different situations.</p>`,
+quiz:{q:"A process sends a disk I/O request and must wait for the disk to respond. What state does it enter?",opts:["Ready — it's still ready to run","Running — it stays running while waiting","Waiting — it's blocked until I/O completes","Terminated — it exits after requesting I/O"],ans:2,exp:"When a process makes an I/O request, it enters the Waiting (or Blocked) state because it cannot proceed until the I/O completes. This frees the CPU for other processes. When the I/O finally completes, the process transitions to Ready (not Running directly) — it must be scheduled by the CPU scheduler before it can resume execution."}
+},
+{sec:"3.1.3",title:"Process Control Block (PCB) — The OS's Dossier",
+content:`<p class="text">The OS needs to track every process in the system. Where is it in memory? What state is it in? Which files does it have open? Which CPU registers was it using? All of this is stored in a data structure called the <strong>Process Control Block</strong> — or PCB.</p>
+<div class="analogy"><div class="analogy-label">📁 Analogy</div>Think of the PCB as a student's complete academic file at a university. It contains their ID (process identifier), current enrollment status (process state), which courses they're in (open files), their transcript (accounting info), and where they're currently sitting in the building (memory location). The registrar (OS) consults this file whenever it needs to deal with that student.</div>
+<div class="grid">
+<div class="card"><h4>Process state</h4><p>New, Ready, Running, Waiting, or Terminated — the current lifecycle status.</p></div>
+<div class="card"><h4>Program counter</h4><p>The address of the <strong>next instruction</strong> to execute. Critical for resuming after an interrupt.</p></div>
+<div class="card"><h4>CPU registers</h4><p>All register values (accumulators, stack pointer, index registers) saved so execution can resume identically.</p></div>
+<div class="card"><h4>Scheduling info</h4><p>Priority level, pointers to scheduling queues. Determines who gets the CPU next.</p></div>
+<div class="card"><h4>Memory info</h4><p>Base/limit registers, page tables — defines what memory this process is allowed to access.</p></div>
+<div class="card"><h4>I/O status</h4><p>List of allocated I/O devices, list of open file descriptors.</p></div>
+</div>
+<div class="callout green">In <strong>Linux</strong>, the PCB is the <code>task_struct</code> C structure, defined in <code>&lt;include/linux/sched.h&gt;</code>. All active processes form a <strong>doubly linked list</strong> of task_structs. The kernel keeps a pointer called <code>current</code> pointing to whichever process is running right now. Changing a process's state is as simple as: <code>current->state = new_state;</code></div>
+<div class="callout">The PCB is <strong>the heart of process management</strong>. When the OS does a context switch (swaps one process for another on the CPU), it saves the entire PCB of the outgoing process and loads the PCB of the incoming one. Without this, a process would lose its place entirely.</div>`,
+quiz:{q:"Why must CPU register values be saved in the PCB when an interrupt occurs?",opts:["To free up register hardware for other programs","So the process can resume exactly where it left off when rescheduled","Because registers are part of the memory management subsystem","The OS deletes register values to conserve power"],ans:1,exp:"When an interrupt stops a running process, the CPU's registers contain the exact state of the computation — what values were being worked with, where the stack is, etc. Saving these into the PCB means that when the process runs again, we can restore all registers to those exact values and the process continues seamlessly as if the interrupt never happened."}
+},
+{sec:"3.1.4",title:"Threads — Multiple Execution Paths in One Process",
+content:`<p class="text">The process model we've discussed so far implies that each process runs a <strong>single thread of execution</strong> — one stream of instructions, doing one thing at a time.</p>
+<p class="text">Think about a single-threaded word processor. It can either accept your typing <em>or</em> run the spell checker — never both simultaneously. While spell checking, your keyboard input is frozen. That's a terrible user experience.</p>
+<div class="analogy"><div class="analogy-label">🍽️ Restaurant analogy</div>A process is like a restaurant kitchen. With a single chef (single thread), they can only do one task at a time — either chop vegetables OR stir the sauce. With multiple chefs (multiple threads), they work simultaneously in the <em>same kitchen</em>, sharing the same ingredients (memory). The restaurant serves food much faster.</div>
+<p class="text"><strong>Modern operating systems extend the process concept</strong> to allow multiple threads of execution within one process. Each thread has its own:</p>
+<div class="grid">
+<div class="card"><h4>Own: Program counter</h4><p>Each thread tracks its own position in the code — threads can be at different points simultaneously.</p></div>
+<div class="card"><h4>Own: Stack</h4><p>Each thread has its own call stack — its own local variables and function call history.</p></div>
+<div class="card"><h4>Shared: Text section</h4><p>All threads in a process run the same code (but can be at different points in it).</p></div>
+<div class="card"><h4>Shared: Data &amp; Heap</h4><p>Threads share global variables and dynamically allocated memory — enabling fast communication but requiring synchronization.</p></div>
+</div>
+<div class="callout green">This is especially powerful on <strong>multicore CPUs</strong> — threads can run <em>truly in parallel</em> on different cores at the exact same time (not just rapidly switching). A multithreaded word processor assigns one thread to receive input while another runs spell check — both happening simultaneously.</div>
+<div class="callout amber">When threads are supported, the <strong>PCB is expanded</strong> to include per-thread information. Chapter 4 covers threads in depth — for now, understand that threads are lightweight "sub-processes" living inside a process and sharing its resources.</div>`,
+quiz:{q:"What do multiple threads within the same process share, and what does each thread have independently?",opts:["Threads share nothing — they're completely isolated","Threads share the text, data, and heap sections; each has its own program counter and stack","Threads share the stack; each has its own heap and data","Threads share everything including their stacks and program counters"],ans:1,exp:"Threads within the same process share the text (code), data (global variables), and heap (dynamic memory) sections — this is what makes inter-thread communication fast. However, each thread has its own program counter (tracking where it is in the code) and its own stack (for its own function calls and local variables). This separation is what allows them to execute independently."}
+},
+{sec:"3.2",title:"Process Scheduling — Who Gets the CPU and When?",
+content:`<p class="text">The CPU is a finite, precious resource. Many processes want it at the same time, but only one (per core) can have it. The OS module responsible for deciding who gets the CPU — and when — is the <strong>process scheduler</strong>.</p>
+<p class="text">There are two high-level objectives that the scheduler must balance:</p>
+<div class="grid">
+<div class="card"><h4>Multiprogramming</h4><p>Keep the CPU busy <strong>at all times</strong>. When one process waits for I/O, immediately give the CPU to another. Maximize CPU utilization — don't waste it sitting idle.</p></div>
+<div class="card"><h4>Time-sharing</h4><p>Switch the CPU among processes so <strong>frequently</strong> that every user feels their program is running interactively — even though they're sharing the CPU with many others.</p></div>
+</div>
+<p class="text">Processes also have fundamentally different behavior patterns — and recognizing these helps the scheduler work smarter:</p>
+<div class="grid">
+<div class="card"><h4>I/O-bound process</h4><p>Spends most time <strong>waiting for I/O</strong>. Uses the CPU in very short bursts. Example: a text editor — waits for keystrokes, then processes them quickly.</p></div>
+<div class="card"><h4>CPU-bound process</h4><p>Spends most time <strong>computing</strong>. Rarely waits for I/O. Example: a video encoder or scientific simulation — crunch numbers continuously for hours.</p></div>
+</div>
+<div class="analogy"><div class="analogy-label">🏦 Bank teller analogy</div>One bank teller (CPU). Some customers (I/O-bound) hand over a check in 5 seconds then wait 10 minutes for approval — the teller is free during that wait. Other customers (CPU-bound) need the teller's full, uninterrupted attention for 30 minutes. A smart scheduler serves the quick customers during the slow customer's wait time — everyone is served faster.</div>
+<div class="callout">A good scheduler mixes I/O-bound and CPU-bound processes cleverly. When a CPU-bound process is crunching, I/O-bound processes can be doing I/O. When the I/O-bound processes finish their I/O, they're given quick CPU bursts. The CPU stays nearly 100% busy.</div>`,
+quiz:{q:"A machine learning training job runs for hours, barely touching the disk or network. What type is it?",opts:["I/O-bound","CPU-bound","Ready-bound","Interrupt-bound"],ans:1,exp:"A process that spends the vast majority of its time doing mathematical computations on the CPU, with very little waiting for I/O, is called CPU-bound. Machine learning training is the quintessential example — it does matrix multiplications continuously. In contrast, a web server is I/O-bound because it constantly waits for network requests and database queries."}
+},
+{sec:"3.2.1",title:"Scheduling Queues — Organizing the Waiting Processes",
+content:`<p class="text">The OS uses <strong>queues</strong> (implemented as linked lists of PCBs) to organize which processes are waiting for what. Understanding these queues explains exactly how process scheduling works in practice.</p>
+<div class="grid">
+<div class="card"><h4>Ready Queue</h4><p>All processes loaded in memory that are <strong>ready to execute</strong>, just waiting for the CPU. The ready queue header points to the first PCB, and each PCB points to the next. The scheduler picks from this queue.</p></div>
+<div class="card"><h4>Wait Queue(s)</h4><p>Processes waiting for a <strong>specific event</strong> — typically I/O completion. There can be multiple wait queues (one per device or event type). A disk wait queue, a keyboard wait queue, etc.</p></div>
+</div>
+<div class="ascii">Ready Queue:
+[header] → [PCB 7] → [PCB 3] → [PCB 14] → [PCB 6] → null
+                                                          ▼
+                                                        CPU core
+
+Disk Wait Queue:
+[header] → [PCB 2] → [PCB 9] → null
+(waiting for disk I/O to complete)
+
+Network Wait Queue:
+[header] → [PCB 11] → null</div>
+<p class="text">Here's the complete flow of a process through the system:</p>
+<div class="callout green">
+1. Process enters → placed in <strong>Ready Queue</strong><br>
+2. Scheduler picks it → CPU executes it → <strong>Running</strong><br>
+3. Process requests I/O → moved to <strong>Wait Queue</strong><br>
+4. I/O completes → moved back to <strong>Ready Queue</strong><br>
+5. Time slice expires / interrupt → put back in <strong>Ready Queue</strong><br>
+6. Process calls exit() → removed from all queues → <strong>Terminated</strong>
+</div>
+<div class="callout amber">The <strong>degree of multiprogramming</strong> = number of processes currently in memory. Higher degree means more processes competing for CPU. The scheduler balances this to optimize throughput and response time.</div>`,
+quiz:{q:"After a process's I/O request completes (e.g., the disk responds), where does the OS place the process?",opts:["Directly back into Running state","Into the Ready Queue","Into a new Wait Queue for the next I/O","It terminates since I/O is done"],ans:1,exp:"When I/O completes, the process moves from the Wait Queue to the Ready Queue — not directly to Running. This is because another process might currently be using the CPU, and the scheduler must decide fairly who runs next. The process must compete again with all other ready processes for CPU time."}
+},
+{sec:"3.2.2–3.2.3",title:"CPU Scheduling & Context Switch — The Mechanics",
+content:`<p class="text">Let's go deeper into two critical mechanisms: how the CPU scheduler works, and what actually happens during a context switch.</p>
+<p class="text"><strong>CPU Scheduler:</strong> Runs very frequently — at least every 100 milliseconds, often much more. Its job: look at the Ready Queue, select a process, and give it the CPU. The exact algorithm used (how it picks) is a huge topic covered in Chapter 5. For now: it picks someone, and that someone gets to run.</p>
+<div class="callout">There's also a technique called <strong>swapping</strong>: moving a process <em>entirely out of RAM to disk</em> when memory is overcommitted. Later it's swapped back in. This reduces the degree of multiprogramming temporarily. It's a last resort — disk is 1000x slower than RAM — but necessary when memory is exhausted. Discussed in Chapter 9.</div>
+<p class="text"><strong>Context Switch:</strong> This is one of the most important mechanisms to truly internalize. When the CPU must switch from running process A to running process B, it performs a context switch.</p>
+<div class="analogy"><div class="analogy-label">📚 Student analogy</div>You're working on a math problem. Your professor interrupts — you must immediately work on chemistry instead. You: (1) write down exactly where you were in the math problem — the current equation, your scratch work, which step you're on — saving it carefully. (2) Pick up the chemistry notes from where <em>that</em> was left off. Later, you can return to math perfectly. The "saving your place" and "loading someone else's place" — that's a context switch.</div>
+<div class="ascii">Process P0          OS kernel          Process P1
+    │                   │                   │
+    │ ──interrupt──────►│                   │
+    │                   │ save PCB0         │
+    │      idle         │                   │
+    │                   │ load PCB1         │
+    │                   │──────────────────►│
+    │                   │            executing
+    │                   │◄──interrupt───────│
+    │                   │ save PCB1         │
+    │                   │ load PCB0         │
+    │◄──────────────────│                   │
+  executing             │             idle</div>
+<div class="callout red">⚠️ Context switch time is <strong>pure overhead</strong> — zero useful work is done for the user while the OS is switching. A typical switch takes a few microseconds. With multiple CPU register sets, it can be just a pointer change. The more complex the OS and memory management, the more expensive the switch.</div>`,
+quiz:{q:"Why is context switch time called 'pure overhead'?",opts:["It takes too long — over 1 second","No useful user computation happens while the OS saves and restores process states","It wastes memory permanently","The CPU generates heat during the switch"],ans:1,exp:"During a context switch, the OS is performing bookkeeping — saving one process's state to its PCB and loading another's. No user program instructions execute during this time. From the application's perspective, the CPU is 'wasted' doing administrative work. This is why hardware architects design CPUs with features (like multiple register banks) to minimize context switch time."}
+},
+{sec:"3.3.1",title:"Process Creation — fork(), exec(), and the Process Tree",
+content:`<p class="text">How does a new process come into existence? In most operating systems, processes are created by <em>other processes</em>. The creating process is the <strong>parent</strong>; the new one is the <strong>child</strong>. Children can create their own children, forming a <strong>tree of processes</strong>.</p>
+<p class="text">Every process is uniquely identified by an integer called the <strong>PID (Process Identifier)</strong>. In Linux, the root of the entire process tree is <strong>systemd</strong> (PID = 1), which is the very first user-space process created at boot. Everything else descends from it.</p>
+<div class="callout green">Historical note: Traditional UNIX used a process called <strong>init</strong> (also PID 1) as the root. Modern Linux distributions replaced it with <strong>systemd</strong>, which is far more flexible and powerful, but serves the same fundamental role — root parent of all processes.</div>
+<p class="text">In UNIX/Linux, processes are created using the <strong>fork()</strong> system call:</p>
+<div class="ascii">Parent calls fork()
+       │
+       ├──► Parent continues running (fork() returns child's PID — a positive number)
+       │
+       └──► Child is created (fork() returns 0 to the child)
+                │
+                └──► Child calls exec("/bin/ls", ...)
+                           │
+                           └──► Child's memory replaced with 'ls' program
+                                      │
+                                      └──► 'ls' runs, then calls exit()
+                                                   │
+                                             Parent's wait() returns
+                                             Parent resumes</div>
+<div class="grid">
+<div class="card"><h4>fork()</h4><p>Creates a <strong>copy</strong> of the parent's address space. Both continue from the same point. fork() returns 0 to child, child's PID to parent. A negative return = error.</p></div>
+<div class="card"><h4>exec()</h4><p><strong>Replaces</strong> the calling process's memory image with a completely new program. After exec(), you're running different code. exec() only returns if it errors.</p></div>
+<div class="card"><h4>wait()</h4><p>Parent calls this to <strong>pause until a child terminates</strong>. Returns the child's exit status. Essential for proper child cleanup.</p></div>
+</div>
+<p class="text">Windows takes a different approach: <strong>CreateProcess()</strong> — creates a child and loads a specified program into it simultaneously. Unlike fork()'s zero parameters, CreateProcess() requires at least <strong>10 parameters</strong>. More complex, but more explicit control.</p>`,
+quiz:{q:"After fork() succeeds, what does the child process receive as the return value?",opts:["The parent's PID","A negative number","Zero","The child's own PID"],ans:2,exp:"fork() returns 0 to the newly created child process. It returns the actual PID of the child (a positive integer) to the parent. A negative return value indicates an error — the fork failed. This difference in return values is exactly how code written after fork() determines 'am I the parent or the child?' — checking if(pid == 0) means you're the child."}
+},
+{sec:"3.3.2",title:"Process Termination — Zombies, Orphans & Android Hierarchy",
+content:`<p class="text">Every process eventually ends. Understanding <em>how</em> and <em>what happens after</em> is just as important as knowing how processes are created.</p>
+<p class="text">A process terminates by calling <strong>exit()</strong> — either explicitly, or implicitly when the main function returns (the C runtime automatically calls exit()). The OS then deallocates the process's memory, closes its open files, and frees its I/O buffers.</p>
+<div class="callout">A parent can also <strong>forcibly terminate a child</strong> using TerminateProcess() on Windows or signals on UNIX. Reasons: the child exceeded its resource allocation, the task is no longer needed, or the parent is exiting and the OS enforces <strong>cascading termination</strong> (all children must die when the parent dies).</div>
+<div class="grid">
+<div class="card"><h4>🧟 Zombie Process</h4><p>Has called exit() and finished, but the <strong>parent hasn't called wait() yet</strong>. Resources freed, but the process table entry remains (to hold exit status). Zombies exist briefly — until parent calls wait().</p></div>
+<div class="card"><h4>🧒 Orphan Process</h4><p>A living child whose <strong>parent terminated without calling wait()</strong>. In Linux/UNIX, systemd (or init) adopts all orphans and periodically calls wait() for them — preventing zombie accumulation.</p></div>
+</div>
+<div class="callout amber">⚠️ <strong>Zombie vs Orphan — memorize this distinction:</strong><br>
+• <strong>Zombie</strong>: Dead child, living parent who hasn't collected it. The child is done but its entry lingers.<br>
+• <strong>Orphan</strong>: Living child, dead parent. The child is still running but has no parent watching it.<br>
+Many accumulating zombies = process table fills up = system can't create new processes = serious problem!</div>
+<p class="text"><strong>Android adds an importance hierarchy</strong> — when memory is low, it kills processes in this order (kills least important first):</p>
+<div class="ascii">Most likely to be killed:
+1. Empty process      (no active components)
+2. Background process (not visible to user)
+3. Service process    (streaming audio, etc.)
+4. Visible process    (visible but not foreground)
+5. Foreground process (app user is actively using)
+Least likely to be killed ↑</div>`,
+quiz:{q:"A child process has finished executing, but its parent is still running and hasn't called wait() yet. What is the child called?",opts:["An orphan process","A daemon process","A zombie process","A background process"],ans:2,exp:"A zombie process is one that has terminated (called exit()) but whose entry still remains in the process table because the parent hasn't called wait() to collect its exit status. Once the parent calls wait(), the zombie is fully cleaned up. If the parent itself dies without calling wait(), the zombie becomes an orphan and is adopted by systemd/init, which then calls wait() to clean it up."}
+},
+{sec:"3.4",title:"Interprocess Communication (IPC) — Why and How Processes Talk",
+content:`<p class="text">Some processes work in complete isolation — they don't need to share data with any other process. We call these <strong>independent processes</strong>.</p>
+<p class="text">But many powerful applications require processes to work together — sharing data, dividing work, and coordinating. These are <strong>cooperating processes</strong>. Why do we want cooperation?</p>
+<div class="grid">
+<div class="card"><h4>Information sharing</h4><p>Multiple apps need the same data. Example: your clipboard (copy-paste) is shared between applications via IPC.</p></div>
+<div class="card"><h4>Computation speedup</h4><p>Break a big task into subtasks running in parallel on multiple cores. Divide-and-conquer for performance. Requires multiple cores for true speedup.</p></div>
+<div class="card"><h4>Modularity</h4><p>Build complex systems as separate communicating components. Each is easier to develop, test, and maintain independently. Microservices architecture is built on this idea.</p></div>
+</div>
+<p class="text">Cooperating processes need an <strong>IPC mechanism</strong> — a way to exchange data. There are two fundamental models:</p>
+<div class="grid">
+<div class="card"><h4>Shared Memory</h4><p>Two processes agree on a <strong>shared region of memory</strong> both can read and write. Setup requires the OS, but after that, data exchange bypasses the kernel — <strong>very fast</strong>. Risk: must carefully synchronize access to prevent conflicts (two processes writing simultaneously).</p></div>
+<div class="card"><h4>Message Passing</h4><p>Processes send and receive <strong>messages through the kernel</strong>. Every exchange is a system call — slower than shared memory. But <strong>safer</strong> (no synchronization needed for the transfer itself) and works across machines (distributed systems).</p></div>
+</div>
+<div class="callout green"><strong>Real-world example — Google Chrome:</strong> Chrome uses separate processes for each tab (renderer processes), one browser process for UI, and plug-in processes. They communicate via IPC. If one tab crashes, only its renderer process dies — your other tabs keep working perfectly. This is the power of multiprocess + IPC design.</div>
+<div class="callout">Rule of thumb: Use <strong>message passing</strong> for smaller amounts of data, distributed systems, or when safety is paramount. Use <strong>shared memory</strong> for large volumes of data between processes on the same machine where speed matters most.</div>`,
+quiz:{q:"Which IPC model requires the kernel to be involved in every data exchange between processes?",opts:["Shared memory","Message passing","Both require kernel involvement for every exchange","Neither requires the kernel after initial setup"],ans:1,exp:"In message passing, every send() and receive() operation goes through the kernel via system calls — the kernel routes each message between processes. In shared memory, the kernel is only needed once to establish the shared memory region. After that, processes read and write directly to that memory region as if it were their own — no kernel involvement, no system calls — which is why shared memory is faster for frequent, large data exchanges."}
+},
+{sec:"Summary",title:"Chapter 3 Complete — Key Takeaways",
+content:`<p class="text">Outstanding work! Let's consolidate everything into a clean, complete mental map before you go.</p>
+<div class="callout green"><strong>Process</strong> = a program in execution. Has text (code), data (globals), heap (dynamic memory), and stack (function calls) sections in memory. Is the fundamental unit of work in a modern OS.</div>
+<div class="callout"><strong>Process States:</strong> New → Ready → Running ↔ Waiting (when I/O occurs) → back to Ready → Terminated. Only one process runs per CPU core at any moment.</div>
+<div class="callout"><strong>PCB (Process Control Block):</strong> The OS's complete record for each process. Contains state, program counter, all CPU register values, scheduling info, memory info, and I/O status. In Linux: <code>task_struct</code>.</div>
+<div class="callout"><strong>Threads:</strong> Multiple execution streams within one process. Share text/data/heap, each has own stack and program counter. Especially powerful on multicore systems.</div>
+<div class="callout"><strong>Scheduling Queues:</strong> Ready Queue (waiting for CPU) and Wait Queues (waiting for I/O/events). CPU scheduler selects from Ready Queue. Context switch saves/restores PCBs — it is pure overhead.</div>
+<div class="callout"><strong>Process Creation:</strong> fork() copies parent → exec() replaces with new program → child calls exit() → parent calls wait(). Zombie = dead child, parent not yet waited. Orphan = living child, dead parent.</div>
+<div class="callout"><strong>IPC:</strong> Independent processes vs cooperating processes. Shared Memory (fast, synchronization risk) vs Message Passing (safe, kernel overhead, works distributed). Chrome browser = great real-world IPC example.</div>
+<p class="text" style="margin-top:1rem">Want to explore further? These questions will deepen your understanding:</p>
+<div style="margin-top:.75rem">
+<button class="explore-btn" onclick="alert('Open Claude chat and ask: Explain context switches in depth — what exactly gets saved, in what order, and how does hardware help minimize the overhead?')">🔄 Deep dive: context switches</button>
+<button class="explore-btn" onclick="alert('Open Claude chat and ask: Show me a complete C program that demonstrates fork() + exec() + wait() with detailed comments explaining each step.')">💻 Code: fork() + exec()</button>
+<button class="explore-btn" onclick="alert('Open Claude chat and ask: What are zombie and orphan processes and give me a real example of how accumulating zombies can crash a system?')">🧟 Zombies & orphans in depth</button>
+<button class="explore-btn" onclick="alert('Open Claude chat and ask: Compare shared memory vs message passing IPC with a real coding example of each in C.')">💬 IPC coding examples</button>
+<button class="explore-btn" onclick="alert('Open Claude chat and ask: Create 10 challenging exam-style questions on Chapter 3 Processes with detailed answer explanations.')">📝 Practice exam questions</button>
+</div>`
+}
+];
+
+let cur=0;
+const quizState={};
+
+function renderDots(){
+  document.getElementById('dots').innerHTML=slides.map((_,i)=>`<button class="dot${i===cur?' active':i<cur?' done':''}" onclick="go(${i})" title="Slide ${i+1}"></button>`).join('');
+}
+
+function renderQuiz(q,si){
+  if(!q)return'';
+  const id=`q${si}`;
+  const answered=quizState[si]!=null;
+  const opts=q.opts.map((o,i)=>{
+    let cls='';
+    if(answered){if(i===q.ans)cls=' correct';else if(i===quizState[si])cls=' wrong';}
+    return`<button class="qopt${cls}"${answered?'disabled':''} onclick="ans(${si},${i},${q.ans})">${o}</button>`;
+  }).join('');
+  const fb=answered?`<div class="qfb ${quizState[si]===q.ans?'ok':'no'}" style="display:block">${quizState[si]===q.ans?'✅ Correct! ':'❌ Not quite. '}${q.exp}</div>`:'<div class="qfb"></div>';
+  return`<div class="quiz"><h4>🧠 Quick check: ${q.q}</h4>${opts}${fb}</div>`;
+}
+
+function ans(si,chosen,correct){
+  quizState[si]=chosen;
+  render();
+}
+
+function render(){
+  const s=slides[cur];
+  document.getElementById('slide').innerHTML=`
+    <div class="slide-section">${s.sec}</div>
+    <div class="slide-title">${s.title}</div>
+    ${s.content}
+    ${renderQuiz(s.quiz,cur)}
+    <div class="nav">
+      <button class="nbtn" onclick="go(${cur-1})" ${cur===0?'disabled':''}>← Previous</button>
+      <span class="counter">Slide ${cur+1} / ${slides.length}</span>
+      <button class="nbtn primary" onclick="go(${cur+1})" ${cur===slides.length-1?'disabled':''}>Next →</button>
+    </div>
+  `;
+  renderDots();
+}
+
+function go(i){if(i>=0&&i<slides.length){cur=i;render();window.scrollTo(0,0);}}
+
+render();
+</script>
+</body>
+</html>
