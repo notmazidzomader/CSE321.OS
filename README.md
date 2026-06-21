@@ -39,7 +39,7 @@
 
 | Topic | Lecture |
 |:------|:--------|
-| 01. Process | [Open](process.html) |
+| 01. Process | [Open](https://notmazidzomader.github.io/CSE321.OS/process.html) |
 | 02. Threads | [Coming Soon](#) |
 | 03. CPU Scheduling | [Coming Soon](#) |
 | 04. Process Synchronization | [Coming Soon](#) |
